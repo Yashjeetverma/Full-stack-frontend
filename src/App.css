@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&family=Roboto&family=Work+Sans:wght@400;500&display=swap');
+
+#root {
+  --primary: #D2153D;
+  --border: linear-gradient(180deg, #FFFFFF 0%, rgba(109, 106, 142, 0.92) 61%, #100B47 100%);
+  --secondary: #EBECEE;
+  --timeline: #28293D;
+  --timeline-border: #D9D9D9;
+  --white: #FFFFFF;
+  --text: #00215B;
+  --text2: #41444B;
+
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.registration-landing {
+  background: var(--primary);
+  height: 100vh;
+}
+.home-landing{
+  background: var(--primary);
+  padding: 100px 0;
+}
+.registration-form {
+  width: 550px !important;
+  margin: auto;
+  background-color: var(--text);
+  border-radius: 10px;
+  padding: 30px 80px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.registration-form-label {
+  color: var(--white);
+}
+
+.shortcut-text {
+  color: var(--white);
+}
+
+.profile-card {
+  background-color: var(--text) !important;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.profile-detail {
+  color: var(--white) !important;
+}
+
+.profile-detail span {
+  padding-left: 10px;
+}
+
+.home {
+  padding: 100px 0;
+  /* max-height: 100vh; */
+}
+
+.form-select {
+  padding: 15px 13px !important;
+}
+
+.profile-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.button-div {
+  padding: 10px 0;
+}
+
+.profile-info{
+  color: var(--white);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 30px;
+  padding: 20px 0;
+}
