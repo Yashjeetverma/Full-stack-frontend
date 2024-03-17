@@ -1,49 +1,50 @@
-//library-import
-import api from "../api";
-
+import {api} from "../api";
 import { toast } from 'react-toastify';
 
-
+// Action Types
 export const LOGIN = 'LOGIN';
 export const SET_AUTHENTICATED = 'SET_AUTHENTICATED';
 export const FETCH_USER = 'FETCH_USER';
 export const UPDATE_USER_DETAILS = 'UPDATE_USER_DETAILS';
 export const LOGOUT = 'LOGOUT';
-export const FETCH_BLOG = 'FETCH_BLOG'
+export const FETCH_BLOG = 'FETCH_BLOG';
+export const CREATE_BLOG_SUCCESS = 'CREATE_BLOG_SUCCESS';
+export const CREATE_BLOG_FAILURE = 'CREATE_BLOG_FAILURE';
+export const SESSION_EXPIRED = 'SESSION_EXPIRED';
 
-
+// Action Creators
 export const login = (token) => ({
   type: LOGIN,
   payload: { user: { token } },
 });
+
 export const setAuthenticated = (status) => ({
   type: SET_AUTHENTICATED,
   payload: status,
 });
+
 export const fetchUser = (user) => ({
   type: FETCH_USER,
   payload: { user },
 });
 
-export const fetchUserData = (token) => {
-  return async (dispatch) => {
-    try {
-      if (token) {
-        dispatch(login(token));
-      }
-
-      const response = await api.get('/user');
-
-      if (response.status === 200) {
-        const userData = response.data;
-        dispatch(fetchUser(userData));
-      } else {
-        console.error('Error fetching user data:', response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
+export const fetchUserData = (token) => async (dispatch) => {
+  try {
+    if (token) {
+      dispatch(login(token));
     }
-  };
+
+    const response = await api.get('/user');
+
+    if (response.status === 200) {
+      const userData = response.data;
+      dispatch(fetchUser(userData));
+    } else {
+      handleError(response.data);
+    }
+  } catch (error) {
+    handleError(error);
+  }
 };
 
 export const createBlog = (title, content, categories) => async (dispatch) => {
@@ -51,39 +52,48 @@ export const createBlog = (title, content, categories) => async (dispatch) => {
     const response = await api.post('/blogs', { title, content, categories });
 
     if (response.status === 200) {
-      dispatch({ type: 'CREATE_BLOG_SUCCESS' });
+      dispatch({ type: CREATE_BLOG_SUCCESS });
       toast.success('Blog created successfully!');
       return true;
     } else {
-      dispatch({ type: 'CREATE_BLOG_FAILURE', error: response.data.error });
-      toast.error('Unable to create blog!');
-      return false;
+      handleError(response.data);
+      return false; 
     }
   } catch (error) {
-    dispatch({ type: 'CREATE_BLOG_FAILURE', error: error.message });
-    return false;
+    handleError(error);
+    return false; 
   }
 };
+
 
 export const fetchBlogs = (blogs) => ({
   type: FETCH_BLOG,
   payload: { blogs },
 });
 
-
-export const fetchBlogCreatedByUser = (token) => {
-  return async (dispatch) => {
-    try {
+export const fetchBlogCreatedByUser = (includeUserToken = false) => async (dispatch) => {
+  try {
+    if (includeUserToken) {
+      const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
       if (token) {
         dispatch(login(token))
       }
+      const response = await api.get('/blogs', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      dispatch(fetchBlogs(response.data))
+    } else {
       const response = await api.get('/blogs');
       dispatch(fetchBlogs(response.data))
-    } catch (error) {
-      console.error('Error fetching user blogs:', error);
     }
+  } catch (error) {
+    handleError(error);
   }
 }
+
+
 
 export const deleteBlog = (blogId, userToken) => async (dispatch) => {
   try {
@@ -94,19 +104,17 @@ export const deleteBlog = (blogId, userToken) => async (dispatch) => {
       dispatch(fetchUserData(userToken));
       dispatch(fetchBlogCreatedByUser(userToken));
     } else {
-      toast.error(`${response.data.error}`);
+      handleError(response.data);
     }
   } catch (error) {
-    toast.error('Error deleting blog:', error.message);
+    handleError(error);
   }
 };
 
-export const updateUserDetails = (updatedDetails) => {
-  return {
-    type: UPDATE_USER_DETAILS,
-    payload: updatedDetails,
-  };
-};
+export const updateUserDetails = (updatedDetails) => ({
+  type: UPDATE_USER_DETAILS,
+  payload: updatedDetails,
+});
 
 export const handleUserDetailsUpdate = (formData) => async (dispatch) => {
   try {
@@ -122,17 +130,23 @@ export const handleUserDetailsUpdate = (formData) => async (dispatch) => {
       dispatch(updateUserDetails(updatedUserDetails));
       return updatedUserDetails;
     } else {
-      throw new Error(response.data.error);
+      handleError(response.data);
     }
   } catch (error) {
-    throw error;
+    handleError(error);
   }
 };
 
 export const sessionExpired = () => ({
-  type: 'SESSION_EXPIRED'
+  type: SESSION_EXPIRED
 });
 
 export const logout = () => ({
   type: LOGOUT,
 });
+
+// Helper function to handle errors
+const handleError = (error) => {
+  console.error('Error:', error);
+  toast.error('An error occurred!');
+};

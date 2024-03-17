@@ -15,7 +15,7 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-import api from './api';
+import { api, cancel } from './api';
 
 const SignUp = lazy(() => import('./Components/SignUp'));
 const Login = lazy(() => import('./Components/Login'));
@@ -30,6 +30,7 @@ const LoadingSpinner = () => (
 
 const App = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const sessionExpired = useSelector(state => state.auth.sessionExpired);
 
   useEffect(() => {
@@ -44,8 +45,9 @@ const App = () => {
     try {
       if (userToken) {
         const response = await api.post('/logout');
-
-        if (response.ok) {
+  
+        if (response.status === 200) {
+          cancel(); // Cancel any ongoing requests
           dispatch(logout());
           localStorage.removeItem('userToken');
           navigate('/');

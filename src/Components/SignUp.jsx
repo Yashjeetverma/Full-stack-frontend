@@ -14,7 +14,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 //base-url
-import { BASE_URL } from '../utils/constants';
+import { api } from '../api';
 
 
 const SignUp = () => {
@@ -30,34 +30,23 @@ const SignUp = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await fetch(`${BASE_URL}api/signup`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ fullName, email, password, confirmPassword }),
-            });
-
-            if (response.ok) {
-                toast.success('User registered successfully');
-                const responseData = await response.json();
-                console.log(responseData);
-                navigate('/');
-                setLoading(false)
-            } else {
-                const errorData = await response.json();
-                toast.error(`${errorData.error}`);
-                setLoading(false)
-            }
+            const response = await api.post('/signup', { fullName, email, password, confirmPassword });
+            toast.success('User registered successfully');
+            const responseData = response.data;
+            console.log(responseData);
+            navigate('/');
         } catch (error) {
-            toast.error('Error during signup:', error);
-            setLoading(false)
+            console.log(error);
+            const errorMessage = JSON.parse(error.request.response).error;
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
     return (
         <section className='d-flex justify-content-center align-items-center registration-landing'>
             <div className='row container'>
-                <ToastContainer position="top-right" autoClose={4000} />
+                <ToastContainer position="top-right" autoClose={1000} />
 
                 <Form className='registration-form' onSubmit={handleSignUp}>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">

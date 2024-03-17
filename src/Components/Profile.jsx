@@ -52,7 +52,7 @@ const Profile = () => {
     setUserToken(userToken)
     if (userToken) {
       dispatch(fetchUserData(userToken));
-      dispatch(fetchBlogCreatedByUser(userToken));
+      dispatch(fetchBlogCreatedByUser(true));
     }
   }, [dispatch]);
 

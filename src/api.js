@@ -1,8 +1,14 @@
 import axios from 'axios';
 import { sessionExpired } from './actions/authActions';
 
+const CancelToken = axios.CancelToken;
+let cancel;
+
 const api = axios.create({
   baseURL: 'http://localhost:3000/api',
+  cancelToken: new CancelToken(function executor(c) {
+    cancel = c;
+  })
 });
 
 api.interceptors.request.use(
@@ -25,7 +31,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response.status === 401 && error.response.data.error === 'TokenExpiredError' && !originalRequest._retry) {
+    if (error.response === 401 && error.response.data.error === 'TokenExpiredError' && !originalRequest._retry) {
       originalRequest._retry = true;
       localStorage.removeItem('userToken');
       sessionExpired();
@@ -36,4 +42,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export {api, cancel};

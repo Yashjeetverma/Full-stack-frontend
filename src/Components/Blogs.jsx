@@ -23,10 +23,7 @@ const Blogs = () => {
     
 
     useEffect(() => {
-        setUserToken(userToken)
-        if (userToken) {
-            dispatch(fetchBlogCreatedByUser(userToken));
-        }
+        dispatch(fetchBlogCreatedByUser());
     }, [dispatch]);
 
     const handleLatestClick = () => {

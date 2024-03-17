@@ -1,52 +1,60 @@
-import { LOGIN, SET_AUTHENTICATED, FETCH_USER, UPDATE_USER_DETAILS, LOGOUT, FETCH_BLOG } from "../actions/authActions";
+import {
+  LOGIN,
+  SET_AUTHENTICATED,
+  FETCH_USER,
+  UPDATE_USER_DETAILS,
+  LOGOUT,
+  FETCH_BLOG,
+  SESSION_EXPIRED
+} from "../actions/authActions";
 
 const initialState = {
   user: { token: null },
   blogs: [],
-  authenticated: false,
+  isAuthenticated: false,
   sessionExpired: false
 };
 
 const authReducer = (state = initialState, action) => {
-  switch (action.type) {
+  const { type, payload } = action;
+  switch (type) {
     case LOGIN:
       return {
         ...state,
-        user: { token: action.payload.token },
+        user: { token: payload.token },
         isAuthenticated: true
       };
     case SET_AUTHENTICATED:
       return {
         ...state,
-        authenticated: action.payload,
+        isAuthenticated: payload
       };
     case FETCH_USER:
       return {
         ...state,
-        user: action.payload.user,
+        user: payload.user
       };
     case FETCH_BLOG:
       return {
         ...state,
-        blogs: action.payload.blogs,
+        blogs: payload.blogs
       };
     case UPDATE_USER_DETAILS:
       return {
         ...state,
         user: {
           ...state.user,
-          ...action.payload,
-        },
+          ...payload
+        }
       };
-    case 'SESSION_EXPIRED':
+    case SESSION_EXPIRED:
       return {
         ...state,
         sessionExpired: true
       };
     case LOGOUT:
       return {
-        ...state,
-        user: { token: null },
+        ...initialState,
         isAuthenticated: false
       };
     default:

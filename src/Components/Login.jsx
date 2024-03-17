@@ -18,7 +18,7 @@ import { useDispatch } from 'react-redux';
 import { login } from '../actions/authActions';
 import { fetchUserData } from '../actions/authActions';
 
-import { BASE_URL } from '../utils/constants';
+import { api } from '../api';
 
 const Login = () => {
 
@@ -32,33 +32,29 @@ const Login = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        setLoading(true)
+        setLoading(true);
         try {
-            const response = await fetch(`${BASE_URL}api/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (response.ok) {
-                toast.success('Login successful');
-                const responseData = await response.json();
-                localStorage.setItem('userToken', responseData.token);
-                dispatch(login(responseData.token));
-                dispatch(fetchUserData(responseData.token));
-                navigate('/dashboard');
-            } else {
-                const errorData = await response.json();
-                toast.error(`${errorData.error}`);
-                setLoading(false)
-            }
+            const response = await api.post('/login', { email, password });
+            const responseData = response.data;
+            localStorage.setItem('userToken', responseData.token);
+            dispatch(login(responseData.token));
+            dispatch(fetchUserData(responseData.token));
+            toast.success('Login successful');
+            navigate('/dashboard');
         } catch (error) {
-            toast.error(`${error}`);
-            setLoading(false)
+            console.error(error);
+            if (error && error.request && error.request.response) {
+                const errorMessage = JSON.parse(error.request.response).error;
+                toast.error(errorMessage);
+            } else {
+                toast.error('An unexpected error occurred during login.');
+            }
+        } finally {
+            setLoading(false);
         }
     };
+    
+    
     return (
         <section className='d-flex justify-content-center align-items-center registration-landing'>
             <div className='row container'>
