@@ -11,6 +11,7 @@ import {
 const initialState = {
   user: { token: null },
   blogs: [],
+  totalPages: 1,
   isAuthenticated: false,
   sessionExpired: false
 };
@@ -37,7 +38,8 @@ const authReducer = (state = initialState, action) => {
     case FETCH_BLOG:
       return {
         ...state,
-        blogs: payload.blogs
+        blogs: payload.blogs,
+        totalPages: payload.totalPages
       };
     case UPDATE_USER_DETAILS:
       return {

@@ -1,4 +1,4 @@
-import {api} from "../api";
+import { api } from "../api";
 import { toast } from 'react-toastify';
 
 // Action Types
@@ -57,42 +57,46 @@ export const createBlog = (title, content, categories) => async (dispatch) => {
       return true;
     } else {
       handleError(response.data);
-      return false; 
+      return false;
     }
   } catch (error) {
     handleError(error);
-    return false; 
+    return false;
   }
 };
 
 
-export const fetchBlogs = (blogs) => ({
+export const fetchBlogs = (blogs, totalPages) => ({
   type: FETCH_BLOG,
-  payload: { blogs },
+  payload: { blogs, totalPages },
 });
 
-export const fetchBlogCreatedByUser = (includeUserToken = false) => async (dispatch) => {
+export const fetchBlogCreatedByUser = (includeUserToken = false, page = 1, limit = 5) => async (dispatch) => {
   try {
     if (includeUserToken) {
-      const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
+      const token = localStorage.getItem('token');
       if (token) {
-        dispatch(login(token))
+        dispatch(login(token));
       }
       const response = await api.get('/blogs', {
         headers: {
           Authorization: `Bearer ${token}`
-        }
+        },
+        params: { page, limit }
       });
-      dispatch(fetchBlogs(response.data))
+      const { blogs, totalPages } = response.data;
+      dispatch(fetchBlogs(blogs, totalPages));
     } else {
-      const response = await api.get('/blogs');
-      dispatch(fetchBlogs(response.data))
+      const response = await api.get('/blogs', {
+        params: { page, limit }
+      });
+      const { blogs, totalPages } = response.data;
+      dispatch(fetchBlogs(blogs, totalPages));
     }
   } catch (error) {
     handleError(error);
   }
-}
-
+};
 
 
 export const deleteBlog = (blogId, userToken) => async (dispatch) => {

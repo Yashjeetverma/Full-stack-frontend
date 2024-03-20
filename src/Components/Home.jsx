@@ -85,11 +85,11 @@ const Home = () => {
                         <Form onSubmit={(e) => handleSubmit(e, title, content, categories)}>
                             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                                 <Form.Label>Blog Title</Form.Label>
-                                <Form.Control type="text" placeholder="Learn React Js with these concepts..." value={title} onChange={(e) => setTitle(e.target.value)} required minLength={10} />
+                                <Form.Control type="text" placeholder="Learn React Js with these concepts..." value={title} onChange={(e) => setTitle(e.target.value)} required minLength={5} />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                                 <Form.Label>Blog Content</Form.Label>
-                                <Form.Control as="textarea" rows={5} value={content} onChange={(e) => setContent(e.target.value)} required minLength={100} placeholder='React.js is a JavaScript library for building user interfaces, particularly for single-page...' />
+                                <Form.Control as="textarea" rows={5} value={content} onChange={(e) => setContent(e.target.value)} required minLength={5} placeholder='React.js is a JavaScript library for building user interfaces, particularly for single-page...' />
                             </Form.Group>
                             <Form.Select aria-label="Default select example" className="mb-3 form-select" value={categories} onChange={(e) => setCategories(e.target.value)}>
                                 <option>Select your categories</option>
