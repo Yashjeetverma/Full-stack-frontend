@@ -31,15 +31,47 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response === 401 && error.response.data.error === 'TokenExpiredError' && !originalRequest._retry) {
+    if (error.response && error.response.status === 401 && error.response.data.error === 'TokenExpiredError' && !originalRequest._retry) {
       originalRequest._retry = true;
       localStorage.removeItem('userToken');
+      // Dispatch the sessionExpired action
       sessionExpired();
       alert('Session expired. Please login again.');
+      window.location.href = '/';
     }
 
     return Promise.reject(error);
   }
 );
 
-export {api, cancel};
+const createAxiosInstance = (dispatch) => {
+  const source = axios.CancelToken.source();
+  const instance = axios.create({
+    baseURL: 'http://localhost:3000/api',
+    cancelToken: source.token
+  });
+
+  // Pass dispatch to the interceptor
+  instance.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    async (error) => {
+      const originalRequest = error.config;
+
+      if (error.response && error.response.status === 401 && error.response.data.error === 'TokenExpiredError' && !originalRequest._retry) {
+        originalRequest._retry = true;
+        localStorage.removeItem('userToken');
+        dispatch(sessionExpired());
+        alert('Session expired. Please login again.');
+        window.location.href = '/';
+      }
+
+      return Promise.reject(error);
+    }
+  );
+
+  return { instance, cancel: source.cancel };
+};
+
+export { api, cancel, createAxiosInstance };

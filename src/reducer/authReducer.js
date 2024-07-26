@@ -36,6 +36,7 @@ const authReducer = (state = initialState, action) => {
         user: payload.user
       };
     case FETCH_BLOG:
+      // console.log("Blogs received:", action.blogs),
       return {
         ...state,
         blogs: payload.blogs,

@@ -73,23 +73,23 @@ export const fetchBlogs = (blogs, totalPages) => ({
 
 export const fetchBlogCreatedByUser = (includeUserToken = false, page = 1, limit = 5) => async (dispatch) => {
   try {
+    let params = { limit };
     if (includeUserToken) {
       const token = localStorage.getItem('token');
       if (token) {
         dispatch(login(token));
+        params.page = page;
       }
       const response = await api.get('/blogs', {
         headers: {
           Authorization: `Bearer ${token}`
         },
-        params: { page, limit }
+        params
       });
       const { blogs, totalPages } = response.data;
       dispatch(fetchBlogs(blogs, totalPages));
     } else {
-      const response = await api.get('/blogs', {
-        params: { page, limit }
-      });
+      const response = await api.get('/blogs', { params });
       const { blogs, totalPages } = response.data;
       dispatch(fetchBlogs(blogs, totalPages));
     }
@@ -97,6 +97,7 @@ export const fetchBlogCreatedByUser = (includeUserToken = false, page = 1, limit
     handleError(error);
   }
 };
+
 
 
 export const deleteBlog = (blogId, userToken) => async (dispatch) => {

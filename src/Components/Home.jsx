@@ -18,6 +18,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 //component
 import Blogs from './Blogs';
+import Dashboard from './Dashboard';
 
 const Home = () => {
     const [userToken, setUserToken] = useState(localStorage.getItem('userToken'));
@@ -60,7 +61,9 @@ const Home = () => {
         }
     };
     return (
-        <section className='home d-flex justify-content-center align-items-center'>
+        <>
+        <Dashboard/>
+            <section className='home d-flex justify-content-center align-items-center'>
             <div className='row container'>
                 <ToastContainer position="top-right" autoClose={1000} />
                 <div className="p-5 mb-4 bg-light rounded-3">
@@ -113,6 +116,7 @@ const Home = () => {
                 <Blogs />
             </div>
         </section>
+        </>
     )
 }
 
