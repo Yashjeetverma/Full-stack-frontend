@@ -1,21 +1,13 @@
 import React, { Suspense, lazy, useEffect } from 'react';
-
-//react-router
 import { Routes, Route, useNavigate } from 'react-router-dom';
-
-//mui
 import CircularProgress from '@mui/joy/CircularProgress';
-
-//redux
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from './actions/authActions';
-
-//bootstrap-css
+import { logout, sessionExpired } from './actions/authActions'; // Import sessionExpired action
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
-import { api, cancel } from './api';
+import { createAxiosInstance } from './api';
+import Home from './Components/Home';
 
 const SignUp = lazy(() => import('./Components/SignUp'));
 const Login = lazy(() => import('./Components/Login'));
@@ -31,26 +23,26 @@ const LoadingSpinner = () => (
 const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const sessionExpired = useSelector(state => state.auth.sessionExpired);
+  const sessionExpiredState = useSelector(state => state.auth.sessionExpired);
 
   useEffect(() => {
-    if (sessionExpired) {
-      dispatch({ type: 'SESSION_EXPIRED_HANDLED' });
-      window.location.replace('/');
+    if (sessionExpiredState) {
+      dispatch(sessionExpired()); // Dispatch the sessionExpired action
+      navigate('/'); // Redirect to login page
     }
-  }, [sessionExpired, dispatch]);
+  }, [sessionExpiredState, dispatch, navigate]);
 
   const handleLogout = async () => {
     const userToken = localStorage.getItem('userToken');
     try {
       if (userToken) {
-        const response = await api.post('/logout');
-  
+        const { instance, cancel } = createAxiosInstance(dispatch); // Pass dispatch to createAxiosInstance
+        const response = await instance.post('/logout');
         if (response.status === 200) {
-          cancel(); // Cancel any ongoing requests
+          cancel(); // Cancel the previous request
           dispatch(logout());
           localStorage.removeItem('userToken');
-          navigate('/');
+          navigate('/'); // Redirect to login page after logout
         } else {
           console.error('Logout failed:', response.statusText);
         }
@@ -75,6 +67,10 @@ const App = () => {
       <Route
         path="/dashboard"
         element={<Suspense fallback={<LoadingSpinner />}><Dashboard handleLogout={handleLogout} /></Suspense>}
+      />
+       <Route
+        path="/home"
+        element={<Suspense fallback={<LoadingSpinner />}><Home/></Suspense>}
       />
       <Route
         path="/profile"

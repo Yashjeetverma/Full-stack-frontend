@@ -18,13 +18,14 @@ import { useDispatch } from 'react-redux';
 import { login } from '../actions/authActions';
 import { fetchUserData } from '../actions/authActions';
 
+
 import { api } from '../api';
 
 const Login = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -40,7 +41,7 @@ const Login = () => {
             dispatch(login(responseData.token));
             dispatch(fetchUserData(responseData.token));
             toast.success('Login successful');
-            navigate('/dashboard');
+            navigate('/home');
         } catch (error) {
             console.error(error);
             if (error && error.request && error.request.response) {
